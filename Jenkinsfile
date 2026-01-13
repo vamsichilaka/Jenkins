@@ -2,16 +2,17 @@ pipeline {
     agent any
 
     stages {
-        stage('Hello') {
+        stage('Build') {
             steps {
-                echo 'Hello from Jenkins Pipeline'
+                echo 'Building the app'
+                sh 'ls -l'
             }
         }
 
-        stage('Read Code') {
+        stage('Test') {
             steps {
-                sh 'ls -l'
-                sh 'cat README.md'
+                echo 'Running tests'
+                sh 'cat README.md | grep "Hello DevOps"'
             }
         }
     }
