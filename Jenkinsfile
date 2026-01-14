@@ -5,19 +5,29 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo 'Code checked out from GitHub'
+                echo 'Code checked out'
                 sh 'ls -l'
             }
         }
 
-        stage('Test') {
+        stage('Build Artifact') {
             steps {
-                echo 'Testing application files'
+                echo 'Creating versioned artifact'
                 sh '''
-                if [ -f index.html ]; then
-                  echo "index.html exists - TEST PASSED"
+                mkdir -p artifacts
+                cp index.html artifacts/index_$BUILD_NUMBER.html
+                '''
+            }
+        }
+
+        stage('Test Artifact') {
+            steps {
+                echo 'Testing artifact'
+                sh '''
+                if [ -f artifacts/index_$BUILD_NUMBER.html ]; then
+                  echo "Artifact exists - TEST PASSED"
                 else
-                  echo "index.html missing - TEST FAILED"
+                  echo "Artifact missing - TEST FAILED"
                   exit 1
                 fi
                 '''
@@ -26,9 +36,9 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Deploying to Apache web server'
+                echo 'Deploying artifact to Apache'
                 sh '''
-                sudo cp index.html /var/www/html/index.html
+                sudo cp artifacts/index_$BUILD_NUMBER.html /var/www/html/index.html
                 sudo systemctl restart httpd
                 '''
             }
