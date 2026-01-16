@@ -1,12 +1,18 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Checkout') {
-            steps {
-              git branch: 'main', url: 'https://github.com/vamsichilaka/Jenkins.git'
-            }
-        }
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Git branch to build')
+    }
+
+    stage('Checkout Code') {
+    steps {
+        echo "Checking out branch: ${params.BRANCH_NAME}"
+        git branch: "${params.BRANCH_NAME}",
+            url: 'https://github.com/vamsichilaka/Jenkins.git'
+    }
+}
+
 
         stage('Build Artifact') {
             steps {
