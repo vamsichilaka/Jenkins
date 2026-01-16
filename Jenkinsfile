@@ -2,17 +2,14 @@ pipeline {
     agent any
 
     stages {
-
         stage('Checkout') {
             steps {
-                echo 'Code checked out'
-                sh 'ls -l'
+                git 'https://github.com/YOUR-USERNAME/YOUR-REPO.git'
             }
         }
 
         stage('Build Artifact') {
             steps {
-                echo 'Creating versioned artifact'
                 sh '''
                 mkdir -p artifacts
                 cp index.html artifacts/index_$BUILD_NUMBER.html
@@ -22,33 +19,21 @@ pipeline {
 
         stage('Test Artifact') {
             steps {
-                echo 'Testing artifact'
                 sh '''
                 if [ -f artifacts/index_$BUILD_NUMBER.html ]; then
-                  echo "Artifact exists - TEST PASSED"
+                  echo "TEST PASSED"
                 else
-                  echo "Artifact missing - TEST FAILED"
+                  echo "TEST FAILED"
                   exit 1
                 fi
                 '''
             }
         }
 
-        stage('Deploy') {
+        stage('Archive Artifact') {
             steps {
-                echo 'Deploying artifact to Apache'
-                sh '''
-                sudo cp artifacts/index_$BUILD_NUMBER.html /var/www/html/index.html
-                sudo systemctl restart httpd
-                '''
+                archiveArtifacts artifacts: 'artifacts/*.html'
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Cleaning workspace'
-            // cleanWs()
         }
     }
 }
