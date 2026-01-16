@@ -43,5 +43,14 @@ pipeline {
             }
         }
 
+        stage('Deploy to Apache') {
+    steps {
+        echo 'Deploying artifact to Apache web server'
+        sh '''
+        sudo cp artifacts/index_$BUILD_NUMBER.html /var/www/html/index.html
+        '''
+    }
+}
+
     }
 }
