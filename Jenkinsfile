@@ -43,14 +43,23 @@ pipeline {
             }
         }
 
-        stage('Deploy to Apache') {
-    	    steps {
-        	echo 'Deploying artifact to Apache web server'
-        	sh '''
-        	sudo cp artifacts/index_$BUILD_NUMBER.html /var/www/html/index.html
-        	'''
-   	    }
-	}
+        stage('Deploy') {
+            steps {
+                echo "Deploying based on branch: ${params.BRANCH_NAME}"
+                sh '''
+                 if [ "$BRANCH_NAME" = "dev" ]; then
+                    echo "Deploying to DEV environment"
+                    sudo cp artifacts/index_$BUILD_NUMBER.html /var/www/html/dev/index.html
 
+                elif [ "$BRANCH_NAME" = "main" ]; then
+                    echo "Deploying to PROD environment"
+                    sudo cp artifacts/index_$BUILD_NUMBER.html /var/www/html/prod/index.html
+
+                else
+                 echo "No deployment for this branch"
+                fi
+                '''
+            }
+        }
     }
 }
